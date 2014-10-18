@@ -1,16 +1,12 @@
-import os, time, sched
+import os
+from threading import Timer
 TAG='TAG'
-
-delaytime=5*60
-
 if os.name is 'nt':
         HOSTPATH='C:\Windows\System32\drivers\etc\hosts'
         TMPPATH='C:\Windows\System32\drivers\etc\hosts~'
 elif os.name is 'posix':
-    HOSTPATH='/etc/hosts'
-    TMPPATH='/etc/tmp'
-    
-        
+        HOSTPATH='/etc/hosts'
+        TMPPATH='/etc/tmp'
 def block(lst):
         try:
                 '''*********    try to open files to be read and written'''
@@ -69,9 +65,12 @@ def recovery():
         outfd.close()
         os.rename(TMPPATH, HOSTPATH)
         
+def run_proc(lst, delay_time):
 
-block({'www.baidu.com','pi-lot.org'})
-t=sched.scheduler(time.time, time.sleep)
-t.enter(delaytime, 5, recovery,())
-t.run()
-#recovery()
+    block(lst)
+
+    Timer(60*delay_time, recovery, ()).start()
+    '''
+    t=sched.scheduler(time.time, time.sleep)
+    t.enter(delay_time, 5, recovery,())
+    t.run()'''

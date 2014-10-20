@@ -4,8 +4,12 @@ ___So this project helps to block specific sites in a given time for focusing on
 
 ####To Do List
 - ~~block some affixed sites in a fix duration~~ (hard logic code, manipulate with hosts file)
-- UI (first in posix system only)
+- ~~UI (first in posix system only)~~
+- import site list from a file
 - Capture packets instead of hosts file
 - Monitor browsers. Add time punishment while trying to access the blocking sites in the time
 - Self persistence. Persistent while closing the terminal
 	
+####Known bug
+- fail to exit curses mode correctly
+- fail to check the URL availabilty

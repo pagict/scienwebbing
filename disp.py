@@ -1,6 +1,7 @@
 import os, sched, time
 from threading import Timer
 import proc
+import sys
 
 if os.name is 'posix':
     import curses
@@ -99,26 +100,31 @@ if os.name is 'posix':
             str=stdscr.getstr(row,col,255)
 
         #notify_remain_time(time_win, delay_time, delay_time)
+        time_win.insstr(4,0,"Running...")
+        time_win.refresh()
         for i in range(1, delay_time):
             Timer(60*i, set_time_subwin, (time_win, delay_time, delay_time-i)).start()
+        Timer(60*delay_time, exit_program,(time_win,4,0 )).start()
         proc.run_proc(lst,delay_time)
+        while True:
+            pass
 
 
-    def notify_remain_time(win, total_time, remain_time):
-        if remain_time>0:
-            set_time_subwin(win, total_time, remain_time)
-            remain_time = remain_time-1
-            t=sched.scheduler(time.time, time.sleep)
-            t.enter(60, 5, notify_remain_time, win, total_time, remain_time)
-            t.run
+    def exit_program(win, row, col):
+        if curses.has_colors():
+            win.attrset(curses.color_pair(2))
+        win.insstr(row,col,'Block recovered, exiting...')
+        win.refresh()
+        time.sleep(3)
+        curses.endwin()
+        sys.exit(0)
 
     def main(stdscr):
     #pdb.set_trace()
         keyloop(stdscr)
 
-
     curses.wrapper(main)
-    curses.endwin()
+    #curses.endwin()
 else:
     pass
 

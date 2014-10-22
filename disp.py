@@ -1,7 +1,7 @@
-import os, sched, time
+import os, time
 from threading import Timer
 import proc
-import sys
+import sys, pdb
 
 if os.name is 'posix':
     import curses
@@ -22,13 +22,14 @@ if os.name is 'posix':
         lst_win.insstr(0,0,'blocking list:')
         if curses.has_colors():
             lst_win.attrset(curses.color_pair(2))
+        #pdb.set_trace()
         if len(lst)<=y:
             for i in range(len(lst)):
                 lst_win.insstr(i+1,0, ('{index}.'+lst[i]).format(index=i+1))
         else:
-            for i in range(y-1):
+            for i in range(y-2):
                 lst_win.insstr(i+1,0, ('{index}.'+lst[i]).format(index=i+1))
-            lst_win.insstr(y,0, '...')
+            lst_win.insstr(y-1,0, '--MORE--')
         lst_win.refresh()
 
     def set_time_subwin(win, time, remained):
@@ -89,14 +90,23 @@ if os.name is 'posix':
         while str is not '':
             stdscr.move(row, col)
             stdscr.clrtoeol()
-            if str.isdigit():
-                delay_time=int(str)
-                set_time_subwin(time_win,delay_time,delay_time)
-            else:
-                addr=preprocess_url(str)
-                if addr is not None:
-                    lst.append(addr)
-                set_list_subwin(lst_win, lst)
+            str=str.strip()
+            try:
+                f=open(os.path.expanduser(str), 'r')
+                line=f.readline()
+                while line:
+                    lst.append(line.strip())
+                    line=f.readline()
+                set_list_subwin(lst_win,lst)
+            except:
+                if str.isdigit():
+                    delay_time=int(str)
+                    set_time_subwin(time_win,delay_time,delay_time)
+                else:
+                    addr=preprocess_url(str)
+                    if addr is not None:
+                        lst.append(addr)
+                    set_list_subwin(lst_win, lst)
             str=stdscr.getstr(row,col,255)
 
         #notify_remain_time(time_win, delay_time, delay_time)

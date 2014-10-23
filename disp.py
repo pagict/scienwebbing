@@ -1,6 +1,7 @@
 import os, time
 from threading import Timer
-import proc
+import proc, signal, subprocess
+from multiprocessing import Process, Lock
 import sys, pdb
 
 if os.name is 'posix':
@@ -85,8 +86,8 @@ if os.name is 'posix':
         return string
     def keyloop(stdscr):
         lst=[]
-        delay_time=30
-        (str, row, col, lst_win, time_win) = start_window(stdscr, lst, delay_time)
+        delay_mins=30
+        (str, row, col, lst_win, time_win) = start_window(stdscr, lst, delay_mins)
         while str is not '':
             stdscr.move(row, col)
             stdscr.clrtoeol()
@@ -100,8 +101,8 @@ if os.name is 'posix':
                 set_list_subwin(lst_win,lst)
             except:
                 if str.isdigit():
-                    delay_time=int(str)
-                    set_time_subwin(time_win,delay_time,delay_time)
+                    delay_mins=int(str)
+                    set_time_subwin(time_win,delay_mins,delay_mins)
                 else:
                     addr=preprocess_url(str)
                     if addr is not None:
@@ -112,15 +113,20 @@ if os.name is 'posix':
         #notify_remain_time(time_win, delay_time, delay_time)
         time_win.insstr(4,0,"Running...")
         time_win.refresh()
-        for i in range(1, delay_time):
-            Timer(60*i, set_time_subwin, (time_win, delay_time, delay_time-i)).start()
-        Timer(60*delay_time, exit_program,(time_win,4,0 )).start()
-        proc.run_proc(lst,delay_time)
-        while True:
-            pass
+        for i in range(1, delay_mins):
+            Timer(60*i, set_time_subwin, (time_win, delay_mins, delay_mins-i)).start()
+        #Timer(60*delay_time, exit_program,(time_win,4,0 )).start()
+        p=Process(target=proc.run_proc,args=(lst, delay_mins*60, ))
+        p.start()
+        #p.close()
+        p.join(delay_mins*60)
+        #proc.run_proc(lst,delay_time)
+        #Process(target=exit_program, args=(time_win,4,0,delay_mins)).start()
+        exit_program(time_win,4,0,delay_mins)
 
 
-    def exit_program(win, row, col):
+    def exit_program(win, row, col,delay_min):
+        time.sleep(delay_min*60)
         if curses.has_colors():
             win.attrset(curses.color_pair(2))
         win.insstr(row,col,'Block recovered, exiting...')

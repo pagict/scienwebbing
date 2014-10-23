@@ -1,4 +1,4 @@
-import os
+import os,time
 from threading import Timer
 TAG='TAG'
 if os.name is 'nt':
@@ -65,11 +65,12 @@ def recovery():
         outfd.close()
         os.rename(TMPPATH, HOSTPATH)
         
-def run_proc(lst, delay_time):
-
+def run_proc(lst, delay_min):
+    os.setsid()
     block(lst)
-
-    Timer(60*delay_time, recovery, ()).start()
+    time.sleep(60*delay_min)
+    recovery()
+    #Timer(60*delay_time, recovery, ()).start()
     '''
     t=sched.scheduler(time.time, time.sleep)
     t.enter(delay_time, 5, recovery,())

@@ -116,17 +116,18 @@ if os.name is 'posix':
         for i in range(1, delay_mins):
             Timer(60*i, set_time_subwin, (time_win, delay_mins, delay_mins-i)).start()
         #Timer(60*delay_time, exit_program,(time_win,4,0 )).start()
-        p=Process(target=proc.run_proc,args=(lst, delay_mins*60, ))
+        p=Process(target=proc.run_proc,args=(lst, delay_mins, ))
+        p.daemon=True
         p.start()
         #p.close()
+
         p.join(delay_mins*60)
         #proc.run_proc(lst,delay_time)
-        #Process(target=exit_program, args=(time_win,4,0,delay_mins)).start()
         exit_program(time_win,4,0,delay_mins)
 
 
     def exit_program(win, row, col,delay_min):
-        time.sleep(delay_min*60)
+        #time.sleep(delay_min*60)
         if curses.has_colors():
             win.attrset(curses.color_pair(2))
         win.insstr(row,col,'Block recovered, exiting...')

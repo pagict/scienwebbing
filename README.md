@@ -13,6 +13,7 @@ ___So this project helps to block specific sites in a given time for focusing on
 ####Known bug
 - fail to exit curses mode correctly
 - fail to check the URL availability
+- **Need to flush local DNS cache if your site opened recently**
 
 
 ###How to

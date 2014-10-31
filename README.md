@@ -8,8 +8,29 @@ ___So this project helps to block specific sites in a given time for focusing on
 - ~~import site list from a file~~
 - Capture packets instead of hosts file
 - Monitor browsers. Add time punishment while trying to access the blocking sites in the time
-- Self persistence. Persistent while closing the terminal
+- ~~Self persistence. Persistent while closing the terminal~~
 	
 ####Known bug
 - fail to exit curses mode correctly
-- fail to check the URL availabilty
+- fail to check the URL availability
+
+
+###How to
+####Run
+In Linux/OS X
+
+	sudo python ./source/scienWebbing.py
+In Windows
+(The author hasn't know yet either)
+
+####Begin
+1. Input digit to set minutes, default as 30mins
+	![](./screenshots/set-time.png)
+2. Other than digit would treated as sites
+	![](./screenshots/set-sites.png)
+3. You can reset your time again
+	![](./screenshots/reset-time.png)
+4. Hit enter to run...
+	![](./screenshots/run.png)
+5. When time's up, finish
+	![](./screenshots/finish.png)

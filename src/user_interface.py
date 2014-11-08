@@ -120,7 +120,7 @@ class UIPosix(UserInterface):
         for i in range(1, self.__blocking_minutes):
             Timer(60*i, self.__set_time_win, (self.__blocking_minutes-i,)).start()
         manager = BlockManager(self.__blocking_list, self.__blocking_minutes)
-        p = Process(manager.run, args=())
+        p = Process(target=manager.run, args=())
         p.daemon = True
         p.start()
         p.join(self.__blocking_minutes*60)
@@ -136,7 +136,13 @@ class UIPosix(UserInterface):
         sys.exit(0)
 
     def run(self):
-        curses.wrapper(self.__key_loop)
+        curses.initscr()
+        curses.start_color()
+        curses.cbreak()
+        curses.noecho()
+        self.__main_win = curses.newwin(24, 80, 0, 0)
+        self.__key_loop()
+
 
 
 class UIWindows(UserInterface):

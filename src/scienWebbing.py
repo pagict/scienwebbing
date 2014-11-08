@@ -1,4 +1,5 @@
 if __name__ == '__main__':
-    import disp
+    from user_interface import UIPosix
 
-    disp.main()
+    ui = UIPosix()
+    ui.run()

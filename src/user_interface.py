@@ -50,7 +50,7 @@ class UIPosix(UserInterface):
             self.__lst_win.insstr(y-1, 0, '--MORE--')
         self.__lst_win.refresh()
 
-    def __set_time_win(self, remain_minutes):
+    def __set_time_win(self, remain_minutes, prompt, prompt_color=None):
         self.__time_win.erase()
         if curses.has_colors():
             curses.init_pair(4, curses.COLOR_GREEN, curses.COLOR_BLACK)
@@ -59,6 +59,10 @@ class UIPosix(UserInterface):
         self.__time_win.insstr(0, 0, time_str)
         remain_str = 'Time Remaining: {remain_time}min'.format(remain_time=remain_minutes)
         self.__time_win.insstr(1, 0, remain_str)
+        if len(prompt) > 0:
+            if curses.has_colors():
+                self.__time_win.attrset(prompt_color)
+            self.__time_win.insstr(4, 0, prompt)
         self.__time_win.refresh()
 
     def __start_window(self):
@@ -86,7 +90,7 @@ class UIPosix(UserInterface):
         self.__set_list_win()
         ''' set subwin for time '''
         self.__time_win = self.__main_win.derwin(win_y-4, win_x/2, 4, win_x/2)
-        self.__set_time_win(self.__blocking_minutes)
+        self.__set_time_win(self.__blocking_minutes, '')
         return self.__main_win.getstr(1, len(input_str)+1, 255), 1, len(input_str)+1,
 
     def __preprocess_url(self, string):
@@ -108,28 +112,26 @@ class UIPosix(UserInterface):
             except:
                 if string.isdigit():
                     self.__blocking_minutes = int(string)
-                    self.__set_time_win(self.__blocking_minutes)
+                    self.__set_time_win(self.__blocking_minutes, '')
                 else:
                     url = self.__preprocess_url(string)
                     if url is not None:
                         self.__blocking_list.append(url)
                     self.__set_list_win()
             string = self.__main_win.getstr(row, col, 255)
-        self.__time_win.insstr(4, 0, "Running...")
+        self.__set_time_win(self.__blocking_minutes, 'Running...', curses.color_pair(4))
         self.__time_win.refresh()
         for i in range(1, self.__blocking_minutes):
-            Timer(60*i, self.__set_time_win, (self.__blocking_minutes-i,)).start()
+            Timer(60*i, self.__set_time_win, (self.__blocking_minutes-i, 'Running', curses.color_pair(4))).start()
         manager = BlockManager(self.__blocking_list, self.__blocking_minutes)
         p = Process(target=manager.run, args=())
         p.daemon = True
         p.start()
         p.join(self.__blocking_minutes*60)
-        self.__exit_program(4, 0)
+        self.__exit_program()
 
-    def __exit_program(self, string_row, string_col):
-        if curses.has_colors():
-            self.__time_win.attrset(curses.color_pair(2))
-        self.__time_win.insstr(string_row, string_col, 'Block recovered, exiting...')
+    def __exit_program(self):
+        self.__set_time_win(0, 'Block recovered, exiting... ', curses.color_pair(2))
         self.__time_win.refresh()
         time.sleep(3)
         curses.endwin()

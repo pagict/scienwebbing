@@ -1,8 +1,7 @@
 import os
-import sys
-import sets
 import time
 import socket
+import platform
 import subprocess
 
 
@@ -24,11 +23,11 @@ class BlockManager(object):
             self.__block_host.append(hostname)
 
     def __block(self):
-        if 'linux' in sys.platform:
+        if 'Linux' in platform.system():
             self.__linux_block()
 
     def __recovery(self):
-        if 'linux' in sys.platform:
+        if 'Linux' in platform.system():
             self.__linux_recovery()
 
     def __linux_block(self):
@@ -47,4 +46,4 @@ class BlockManager(object):
             info = socket.getaddrinfo(host, None)
             for each in info:
                 self.__block_address.append(each[4][0])
-        self.__block_address = list(sets.Set(self.__block_address))
+        self.__block_address = list(set(self.__block_address))

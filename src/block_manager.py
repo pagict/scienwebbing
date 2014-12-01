@@ -9,13 +9,13 @@ class BlockManager(object):
 
     def __init__(self, block_host=(), block_minutes=0):
         self.__block_host = list(block_host)
-        self.block_minutes = block_minutes
+        self.__block_minutes = block_minutes
 
     def run(self):
             os.setsid()
             self.__parse_host()
             self.__block()
-            time.sleep(60 * self.block_minutes)
+            time.sleep(60 * self.__block_minutes)
             self.__recovery()
 
     def add_host(self, hostname):

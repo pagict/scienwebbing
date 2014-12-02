@@ -4,6 +4,7 @@ import time
 from threading import Timer
 from multiprocessing import Process
 import sys
+import signal
 
 from block_manager import BlockManager
 
@@ -16,6 +17,11 @@ class UserInterface(object):
         pass
 
 
+def exit_program(arg1, arg2):
+    if curses is not None:
+        curses.endwin()
+    exit(0)
+
 class UIPosix(UserInterface):
     def __init__(self):
         super(UIPosix, self).__init__()
@@ -24,6 +30,7 @@ class UIPosix(UserInterface):
         self.__lst_win = None
         self.__time_win = None
         self.__main_win = None
+        old_signal = signal.signal(signal.SIGINT, exit_program)
 
     def __set_list_win(self):
         """
@@ -128,14 +135,13 @@ class UIPosix(UserInterface):
         p.daemon = True
         p.start()
         p.join(self.__blocking_minutes*60)
-        self.__exit_program()
+        self.__will_exit()
+        exit_program()
 
-    def __exit_program(self):
+    def __will_exit(self):
         self.__set_time_win(0, 'Block recovered, exiting... ', curses.color_pair(2))
         self.__time_win.refresh()
         time.sleep(3)
-        curses.endwin()
-        sys.exit(0)
 
     def run(self):
         curses.initscr()
